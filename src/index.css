@@ -1,0 +1,287 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Menlo, monospace;
+  --font-sans: 'IBM Plex Sans Condensed', 'IBM Plex Mono', ui-sans-serif, system-ui, sans-serif;
+
+  --color-void: #05080b;
+  --color-hull: #0d151c;
+  --color-deck: #111d26;
+  --color-bezel: #1b2a35;
+  --color-rivet: #2c4150;
+  --color-signal: #f5a623;
+  --color-signal-dim: #7a5a24;
+  --color-phosphor: #4fd8e8;
+  --color-phosphor-dim: #24616b;
+  --color-alarm: #ff5f56;
+  --color-go: #57d98a;
+  --color-readout: #d8e6ef;
+  --color-muted: #7d94a4;
+  --color-faint: #4d626f;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-void);
+    color: var(--color-readout);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Mission-control vernacular: numerals, codes and readouts are always monospaced. */
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-phosphor);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-signal);
+    color: var(--color-void);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-void);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-bezel);
+    border: 2px solid var(--color-void);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-rivet);
+  }
+}
+
+@layer components {
+  /* Instrument bezel: a shallow inset frame with machined corner brackets. */
+  .bezel {
+    position: relative;
+    background:
+      linear-gradient(180deg, rgba(79, 216, 232, 0.035), transparent 46%),
+      var(--color-hull);
+    border: 1px solid var(--color-bezel);
+    box-shadow:
+      inset 0 1px 0 rgba(216, 230, 239, 0.05),
+      inset 0 0 24px rgba(0, 0, 0, 0.55);
+  }
+
+  .bezel::before,
+  .bezel::after {
+    content: '';
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border: 1px solid var(--color-rivet);
+    pointer-events: none;
+  }
+
+  .bezel::before {
+    top: 4px;
+    left: 4px;
+    border-right: 0;
+    border-bottom: 0;
+  }
+
+  .bezel::after {
+    bottom: 4px;
+    right: 4px;
+    border-left: 0;
+    border-top: 0;
+  }
+
+  .rule {
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--color-bezel) 0 6px,
+      transparent 6px 10px
+    );
+    height: 1px;
+  }
+
+  .readout {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+  }
+
+  .stamp {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .field {
+    width: 100%;
+    background: #08111799;
+    border: 1px solid var(--color-bezel);
+    border-left: 2px solid var(--color-phosphor-dim);
+    padding: 0.6rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--color-readout);
+  }
+
+  .field::placeholder {
+    color: var(--color-faint);
+  }
+
+  .field:focus {
+    border-left-color: var(--color-phosphor);
+    background: #0a161d;
+    outline: none;
+    box-shadow: inset 0 0 0 1px rgba(79, 216, 232, 0.25);
+  }
+
+  .switch {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 0.55rem 1rem;
+    border: 1px solid var(--color-signal);
+    color: var(--color-signal);
+    background: linear-gradient(180deg, rgba(245, 166, 35, 0.16), rgba(245, 166, 35, 0.05));
+    cursor: pointer;
+    transition: background 120ms linear, color 120ms linear;
+  }
+
+  .switch:hover:not(:disabled) {
+    background: var(--color-signal);
+    color: var(--color-void);
+  }
+
+  .switch:disabled {
+    border-color: var(--color-bezel);
+    color: var(--color-faint);
+    background: transparent;
+    cursor: not-allowed;
+  }
+
+  .switch-ghost {
+    border-color: var(--color-rivet);
+    color: var(--color-muted);
+    background: transparent;
+  }
+
+  .switch-ghost:hover:not(:disabled) {
+    background: var(--color-bezel);
+    color: var(--color-readout);
+  }
+}
+
+/* Ambient CRT layers ------------------------------------------------------ */
+
+.scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0 2px,
+    rgba(0, 0, 0, 0.28) 2px 4px
+  );
+  opacity: 0.32;
+  mix-blend-mode: multiply;
+}
+
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 40%, transparent 52%, rgba(0, 0, 0, 0.72) 100%);
+}
+
+.sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.5;
+}
+
+.sweep::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 190vmax;
+  height: 190vmax;
+  translate: -50% -50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(79, 216, 232, 0.14) 0deg,
+    rgba(79, 216, 232, 0.02) 26deg,
+    transparent 60deg,
+    transparent 360deg
+  );
+  animation: sweep 9s linear infinite;
+}
+
+@keyframes sweep {
+  to {
+    rotate: 360deg;
+  }
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(44, 65, 80, 0.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(44, 65, 80, 0.22) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.blip {
+  animation: blip 2.4s ease-in-out infinite;
+}
+
+@keyframes blip {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.boot-line {
+  animation: type-in 180ms ease-out both;
+}
+
+@keyframes type-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sweep::after,
+  .blip,
+  .boot-line {
+    animation: none !important;
+  }
+  .sweep {
+    opacity: 0.18;
+  }
+}
